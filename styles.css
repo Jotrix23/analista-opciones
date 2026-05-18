@@ -290,6 +290,82 @@ h1 {
 
 #userInput::placeholder { color: var(--text-secondary); }
 
+/* ── ATTACH BUTTON ── */
+#attachBtn {
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--text-secondary);
+    flex-shrink: 0;
+    transition: color 0.2s, background 0.2s;
+    padding: 0;
+}
+
+#attachBtn:hover {
+    color: var(--accent-green);
+    background: rgba(0, 208, 132, 0.08);
+}
+
+#attachBtn.has-image {
+    color: var(--accent-green);
+}
+
+/* ── IMAGE PREVIEW ── */
+#imagePreviewArea {
+    padding: 8px 0 6px;
+}
+
+#imagePreviewWrapper {
+    position: relative;
+    display: inline-block;
+}
+
+#imagePreview {
+    max-height: 80px;
+    max-width: 140px;
+    border-radius: 8px;
+    border: 1px solid var(--accent-green);
+    object-fit: cover;
+    display: block;
+}
+
+#removeImageBtn {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    width: 20px;
+    height: 20px;
+    background: var(--accent-red);
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    padding: 0;
+    transition: opacity 0.2s;
+}
+
+#removeImageBtn:hover { opacity: 0.8; }
+
+/* Imagen adjunta dentro del mensaje de chat */
+.message-image {
+    max-width: 260px;
+    max-height: 180px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    display: block;
+    border: 1px solid var(--border);
+    object-fit: cover;
+}
+
 #sendBtn {
     background: var(--accent-green);
     border: none;

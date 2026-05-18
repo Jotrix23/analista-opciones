@@ -3,8 +3,9 @@
 // La API key está en Netlify (variables de entorno), no aquí.
 // El frontend llama al proxy /api/chat para mayor seguridad.
 // ============================================================
-const GROQ_MODEL   = "llama-3.3-70b-versatile";
-const PROXY_URL    = "/api/chat";
+const GROQ_MODEL_TEXT   = "llama-3.3-70b-versatile";
+const GROQ_MODEL_VISION = "meta-llama/llama-4-scout-17b-16e-instruct";
+const PROXY_URL         = "/api/chat";
 
 // ============================================================
 // SYSTEM PROMPT — Personalidad y reglas del analista
@@ -65,6 +66,7 @@ Usa SIEMPRE este formato con estas secciones exactas:
 // ============================================================
 let conversationHistory = [];
 let isLoading = false;
+let pendingImage = null; // { dataUrl, mimeType }
 
 // ============================================================
 // INICIALIZACIÓN
@@ -80,7 +82,7 @@ function checkApiKey() {
     const dot  = document.getElementById('statusDot');
     const text = document.getElementById('statusText');
     dot.classList.add('online');
-    text.textContent = 'Groq · Llama 3.3 70B · Online';
+    text.textContent = 'Groq · Llama 4 Vision · Online';
 }
 
 function setupTextarea() {
@@ -97,6 +99,42 @@ function setupTextarea() {
             sendMessage();
         }
     });
+}
+
+// ============================================================
+// GESTIÓN DE IMAGEN
+// ============================================================
+function handleImageSelect(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    // Solo imágenes, máx 10 MB
+    if (!file.type.startsWith('image/')) {
+        alert('Solo se admiten imágenes.');
+        return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+        alert('La imagen no puede superar 10 MB.');
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        pendingImage = { dataUrl: e.target.result, mimeType: file.type };
+        document.getElementById('imagePreview').src = e.target.result;
+        document.getElementById('imagePreviewArea').style.display = 'block';
+        document.getElementById('attachBtn').classList.add('has-image');
+    };
+    reader.readAsDataURL(file);
+    // Limpiar el input para permitir seleccionar el mismo archivo otra vez
+    event.target.value = '';
+}
+
+function removeImage() {
+    pendingImage = null;
+    document.getElementById('imagePreview').src = '';
+    document.getElementById('imagePreviewArea').style.display = 'none';
+    document.getElementById('attachBtn').classList.remove('has-image');
 }
 
 // ============================================================
@@ -127,18 +165,22 @@ function addSystemMessage(html) {
     scrollToBottom();
 }
 
-function addMessage(role, content, isStreaming = false) {
+function addMessage(role, content, isStreaming = false, imageDataUrl = null) {
     const messages = document.getElementById('messages');
     const div = document.createElement('div');
     div.className = `message ${role}`;
 
     const avatar = role === 'user' ? 'TÚ' : '📊';
-    let bodyHtml;
+    let bodyHtml = '';
+
+    if (imageDataUrl) {
+        bodyHtml += `<img class="message-image" src="${imageDataUrl}" alt="Captura adjunta">`;
+    }
 
     if (isStreaming) {
-        bodyHtml = '<div class="typing-indicator"><span></span><span></span><span></span></div>';
+        bodyHtml += '<div class="typing-indicator"><span></span><span></span><span></span></div>';
     } else {
-        bodyHtml = role === 'user'
+        bodyHtml += role === 'user'
             ? `<p>${escapeHtml(content)}</p>`
             : marked.parse(content);
     }
@@ -161,15 +203,31 @@ async function sendMessage() {
 
     const input    = document.getElementById('userInput');
     const userText = input.value.trim();
-    if (!userText) return;
+    if (!userText && !pendingImage) return;
 
-    // Añadir mensaje del usuario
-    addMessage('user', userText);
-    conversationHistory.push({ role: 'user', content: userText });
+    // Capturar imagen antes de limpiar
+    const imageToSend = pendingImage;
 
-    // Limpiar textarea
+    // Añadir mensaje del usuario (con imagen si la hay)
+    addMessage('user', userText || '(imagen adjunta)', false, imageToSend?.dataUrl);
+
+    // Construir el contenido del mensaje para la API
+    let userContent;
+    if (imageToSend) {
+        userContent = [
+            ...(userText ? [{ type: 'text', text: userText }] : [{ type: 'text', text: 'Analiza esta imagen en el contexto del trading de opciones.' }]),
+            { type: 'image_url', image_url: { url: imageToSend.dataUrl } }
+        ];
+    } else {
+        userContent = userText;
+    }
+
+    conversationHistory.push({ role: 'user', content: userContent });
+
+    // Limpiar textarea e imagen
     input.value = '';
     input.style.height = 'auto';
+    removeImage();
 
     // Bloquear envío
     isLoading = true;
@@ -187,7 +245,7 @@ async function sendMessage() {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                model: GROQ_MODEL,
+                model: imageToSend ? GROQ_MODEL_VISION : GROQ_MODEL_TEXT,
                 messages: [
                     { role: 'system', content: SYSTEM_PROMPT },
                     ...conversationHistory

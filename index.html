@@ -14,7 +14,7 @@
                 <span class="logo-icon">📊</span>
                 <div class="header-text">
                     <h1>Analista de Opciones</h1>
-                    <span class="subtitle">Senior Options Analyst · Powered by Groq + Llama 3.3</span>
+                    <span class="subtitle">Senior Options Analyst · Powered by Groq + Llama 4 Vision</span>
                 </div>
             </div>
             <div class="header-status">
@@ -40,7 +40,26 @@
         </div>
 
         <div id="inputArea">
+            <div id="imagePreviewArea" style="display:none;">
+                <div id="imagePreviewWrapper">
+                    <img id="imagePreview" src="" alt="Preview">
+                    <button id="removeImageBtn" onclick="removeImage()" title="Quitar imagen">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+            </div>
             <div id="inputWrapper">
+                <input type="file" id="imageInput" accept="image/*" style="display:none;" onchange="handleImageSelect(event)">
+                <button id="attachBtn" onclick="document.getElementById('imageInput').click()" title="Adjuntar captura de pantalla">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                        <polyline points="21 15 16 10 5 21"></polyline>
+                    </svg>
+                </button>
                 <textarea
                     id="userInput"
                     placeholder="Pregunta sobre un ticker, estrategia o concepto de opciones..."
