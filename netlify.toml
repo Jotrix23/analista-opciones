@@ -1,3 +1,7 @@
+[build]
+  publish = "."
+  command = ""
+
 [[edge_functions]]
   path = "/api/chat"
   function = "chat"
