@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analista de Opciones | IA Financiera</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+    <div id="app">
+        <header>
+            <div class="header-logo">
+                <span class="logo-icon">📊</span>
+                <div class="header-text">
+                    <h1>Analista de Opciones</h1>
+                    <span class="subtitle">Senior Options Analyst · Powered by Groq + Llama 3.3</span>
+                </div>
+            </div>
+            <div class="header-status">
+                <span class="status-dot" id="statusDot"></span>
+                <span id="statusText">Verificando...</span>
+            </div>
+        </header>
+
+        <div id="chatContainer">
+            <div id="messages">
+                <div class="message assistant">
+                    <div class="message-avatar">📊</div>
+                    <div class="message-content">
+                        <p>¡Hola! Soy tu <strong>Analista Senior de Opciones</strong>. Antes de empezar, dime:</p>
+                        <ul>
+                            <li>¿Cuál es el <strong>tamaño aproximado de tu cuenta</strong>?</li>
+                            <li>¿Tienes algún <strong>ticker o estrategia</strong> en mente?</li>
+                        </ul>
+                        <p><em>⚠️ Análisis educativo. No constituye asesoramiento financiero.</em></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="inputArea">
+            <div id="inputWrapper">
+                <textarea
+                    id="userInput"
+                    placeholder="Pregunta sobre un ticker, estrategia o concepto de opciones..."
+                    rows="1"
+                ></textarea>
+                <button id="sendBtn" onclick="sendMessage()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg>
+                </button>
+            </div>
+            <p class="disclaimer">⚠️ Solo para fines educativos. No constituye asesoramiento financiero.</p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
